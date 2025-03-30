@@ -122,7 +122,8 @@ function QRData() {
     
             scanner.render(
                 (decodedText) => {
-                    setSearchId(decodedText); // Auto-fill search input
+                    setSearchId(decodedText); 
+                    handleSearchData();
                     setIsModalOpen(false);
                     toast.success("QR Code Scanned Successfully!");
                     scanner.clear(); // Properly clear scanner when scan is done
