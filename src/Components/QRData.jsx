@@ -14,6 +14,7 @@ function QRData() {
     const [filterData, setFilterData] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const scannerRef = useRef(null);
+    const qrRef = useRef(null);
 
 
     // Fetch all data from Google Sheet
@@ -114,6 +115,7 @@ function QRData() {
         }
     }
 
+    // opening model and scanning images
     useEffect(() => {
         if (isModalOpen) {
             const scanner = new Html5QrcodeScanner(
@@ -144,6 +146,37 @@ function QRData() {
         };
     }, [isModalOpen]);
     
+    // download the qr by clicking on it
+    const downloadQRCode = () => {
+        const qrElement = document.querySelector("svg");
+    
+        if (!qrElement) {
+            console.error("QR code element not found!");
+            return;
+        }
+    
+        const svgData = new XMLSerializer().serializeToString(qrElement);
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+    
+        const img = new Image();
+        img.src = "data:image/svg+xml;base64," + btoa(svgData);
+    
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+    
+            const pngFile = canvas.toDataURL("image/png");
+    
+            const downloadLink = document.createElement("a");
+            downloadLink.href = pngFile;
+            downloadLink.download = "qrcode.png";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        };
+    };
     
     return (
 
@@ -256,7 +289,7 @@ function QRData() {
                 </div>
                 <div className='ms-10 flex flex-col items-center justify-center'>
                     <h2 className='text-5xl font-bold my-7'>Generated QR Code</h2>
-                    <QRCode bgColor='transparent' fgColor='white' value={identification} />
+                    <QRCode bgColor='transparent' fgColor='white' value={identification} onClick={downloadQRCode} />
                 </div>
             </div>
             {/* QR Scanner Modal */}
