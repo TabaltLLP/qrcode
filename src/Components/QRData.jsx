@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import QRCode from 'react-qr-code';
 import Logo from "../assets/Logo.webp"
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 function QRData() {
     const [data, setData] = useState([]);
@@ -12,6 +13,7 @@ function QRData() {
     const [searchId, setSearchId] = useState("");
     const [filterData, setFilterData] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const scannerRef = useRef(null);
 
 
     // Fetch all data from Google Sheet
@@ -111,6 +113,35 @@ function QRData() {
         }
     }
 
+    useEffect(() => {
+        if (isModalOpen) {
+            const scanner = new Html5QrcodeScanner(
+                "reader",
+                { fps: 10, qrbox: 250 }
+            );
+    
+            scanner.render(
+                (decodedText) => {
+                    setSearchId(decodedText); // Auto-fill search input
+                    setIsModalOpen(false);
+                    toast.success("QR Code Scanned Successfully!");
+                    scanner.clear(); // Properly clear scanner when scan is done
+                },
+                (errorMessage) => {
+                    console.log("QR Code Scan Error:", errorMessage);
+                }
+            );
+    
+            scannerRef.current = scanner;
+        }
+    
+        return () => {
+            if (scannerRef.current) {
+                scannerRef.current.clear().catch(error => console.log("Error clearing scanner:", error));
+            }
+        };
+    }, [isModalOpen]);
+    
     
     return (
 
@@ -226,20 +257,17 @@ function QRData() {
                     <QRCode bgColor='transparent' fgColor='white' value={identification} />
                 </div>
             </div>
-            {/* model for scanning images  */}
+            {/* QR Scanner Modal */}
             {isModalOpen && (
-                    <div className="fixed inset-0 z-10 flex items-center justify-center" style={{backgroundColor:"rgba(0, 0, 0, 0.65)"}}>
-                        <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96 text-center">
-                            <h2 className="text-2xl font-bold mb-4">Scan QR Code</h2>
-                            
-                            <button
-                                onClick={() => setIsModalOpen(false)}
-                                className="mt-4 cursor-pointer px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
-                            >
-                                Close
-                            </button>
-                        </div>
+                <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-75">
+                    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96 text-center">
+                        <h2 className="text-2xl font-bold mb-4">Scan QR Code</h2>
+                        <div id="reader"></div>
+                        <button onClick={() => setIsModalOpen(false)} className="mt-4 px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded">
+                            Close
+                        </button>
                     </div>
+                </div>
             )}
             <ToastContainer />
         </div>
