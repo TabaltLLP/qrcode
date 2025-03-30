@@ -56,6 +56,7 @@ function QRData() {
             .then((data) => {
                 console.log(data)
                 setIdentification(randomGeneratedId)
+                setData(prevData => [...prevData, updatedData]);
                 toast.success("Data added successfully!", {
                     position: "top-right",
                     autoClose: 3000,
