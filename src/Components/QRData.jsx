@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import QRCode from 'react-qr-code';
-import { QrReader } from 'react-qr-reader';
+import Logo from "../assets/Logo.webp"
 
 function QRData() {
     const [data, setData] = useState([]);
@@ -115,6 +115,7 @@ function QRData() {
     return (
 
         <div className="bg-gray-900 text-white flex flex-col gap-10 items-center justify-center p-6">
+            <img src={Logo} width="120px" alt="Logo" />
             <h1 className='text-5xl font-bold'>QR code scanner application</h1>
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-3xl">
                 <h2 className="text-2xl font-bold mb-4 text-center">Read data Using Asset Id</h2>
@@ -230,19 +231,7 @@ function QRData() {
                     <div className="fixed inset-0 z-10 flex items-center justify-center" style={{backgroundColor:"rgba(0, 0, 0, 0.65)"}}>
                         <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96 text-center">
                             <h2 className="text-2xl font-bold mb-4">Scan QR Code</h2>
-                            <QrReader
-                                onResult={(result, error) => {
-                                    if (result) {
-                                        setSearchId(result.text); // Set scanned result to search input
-                                        setIsModalOpen(false); // Close modal
-                                        toast.success("QR Code scanned successfully!");
-                                    }
-                                    if (error) {
-                                        console.log(error);
-                                    }
-                                }}
-                                constraints={{ facingMode: "user" }} 
-                            />
+                            
                             <button
                                 onClick={() => setIsModalOpen(false)}
                                 className="mt-4 cursor-pointer px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
